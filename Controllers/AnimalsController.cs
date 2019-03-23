@@ -18,12 +18,20 @@ namespace OnlineSafari.Controllers
       return animals;
 
     }
+
+
     [HttpGet("{id}")]
-    public ActionResult<Animal> GetChosenSpecies(int id)
+    public ActionResult<Animal> GetChosenId(int id)
     {
       var db = new DatabaseContext();
       var animal = db.Animals.FirstOrDefault(f => f.Id == id);
       return animal;
+    }
+
+    [HttpGet]
+    public ActionResult<string> GetAllSpecies([FromQuery] string query)
+    {
+      return query;
     }
 
     [HttpPost]
