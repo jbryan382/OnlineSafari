@@ -28,7 +28,7 @@ namespace OnlineSafari.Controllers
       return animal;
     }
 
-    [HttpGet]
+    [HttpGet("{query}")]
     public ActionResult<string> GetAllSpecies([FromQuery] string query)
     {
       return query;
