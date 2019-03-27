@@ -10,34 +10,43 @@ namespace OnlineSafari.Controllers
   public class AnimalsController : ControllerBase
   {
 
+    private DatabaseContext db;
+    public AnimalsController()
+    {
+      this.db = new DatabaseContext();
+    }
+
     [HttpGet]
     public ActionResult<IList<Animal>> GetAllSpecies()
     {
-      var db = new DatabaseContext();
       var animals = db.Animals.OrderBy(o => o.Species).ToList();
       return animals;
-
     }
 
 
     [HttpGet("{id}")]
     public ActionResult<Animal> GetChosenId(int id)
     {
-      var db = new DatabaseContext();
       var animal = db.Animals.FirstOrDefault(f => f.Id == id);
       return animal;
     }
 
-    [HttpGet("{query}")]
+    [HttpGet("query/{query}")]
     public ActionResult<string> GetAllSpecies([FromQuery] string query)
     {
       return query;
     }
 
+    [HttpGet("location/{location}")]
+    public ActionResult<IList<Animal>> GetAnimalsByLocation(string location)
+    {
+      var animalsLocation = db.Animals.Where(animal => animal.LocationOfLastSeen.ToLower() == location.ToLower()).ToList();
+      return animalsLocation;
+    }
+
     [HttpPost]
     public ActionResult<Animal> Post([FromBody] Animal newAnimal)
     {
-      var db = new DatabaseContext();
       db.Animals.Add(newAnimal);
       db.SaveChanges();
       return newAnimal;
@@ -46,7 +55,6 @@ namespace OnlineSafari.Controllers
     [HttpPut("{id}")]
     public ActionResult<Animal> UpdateMovie(int id, [FromBody] Animal addToAnimal)
     {
-      var db = new DatabaseContext();
       var animal = db.Animals.FirstOrDefault(f => f.Id == id);
       animal.Species = addToAnimal.Species;
       animal.CountOfTimesSeen = addToAnimal.CountOfTimesSeen;
@@ -58,9 +66,18 @@ namespace OnlineSafari.Controllers
     [HttpDelete("{id}")]
     public ActionResult DeleteMovie(int id)
     {
-      var db = new DatabaseContext();
       var animal = db.Animals.FirstOrDefault(f => f.Id == id);
       db.Animals.Remove(animal);
+      db.SaveChanges();
+      return Ok();
+    }
+
+    [HttpDelete("location/{location}")]
+
+    public ActionResult DeleteAnimals(string location)
+    {
+      var deleteAnimalsByLocation = db.Animals.Where(w => w.LocationOfLastSeen.ToLower() == location.ToLower());
+      db.Animals.RemoveRange(deleteAnimalsByLocation);
       db.SaveChanges();
       return Ok();
     }
